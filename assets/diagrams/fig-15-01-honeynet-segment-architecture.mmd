@@ -1,0 +1,22 @@
+flowchart TB
+    INTERNET(("Internet"))
+
+    subgraph HOME["Home network / management / lab-victim networks"]
+        MGMT["Management VLAN\n(SIEM, admin consoles)"]
+    end
+
+    subgraph HN["Honeynet segment — Part 4 isolation, inbound-only"]
+        EDGE["Edge/gateway host\n(baseline service logging)"]
+        SSHD["SSH decoy\nTCP 2222 (Cowrie-style)"]
+        HTTPD["HTTP decoy\nTCP 80 (§5)"]
+        COLLECT["Collector/correlation backend\nssh_events / http_events / network_events\n-> attack_sessions"]
+        EDGE --> COLLECT
+        SSHD --> COLLECT
+        HTTPD --> COLLECT
+    end
+
+    INTERNET -->|inbound-only,\ndecoy ports only| SSHD
+    INTERNET -->|inbound-only,\ndecoy ports only| HTTPD
+    COLLECT -->|management-facing interface only\nsee Safety Gate| MGMT
+    MGMT -. no route .- HN
+    HOME -. no route .- HN

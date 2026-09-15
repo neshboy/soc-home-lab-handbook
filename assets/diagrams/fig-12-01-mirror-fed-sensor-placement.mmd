@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph MGMT["Management VLAN (Part 4)"]
+        HV["Hypervisor mgmt interface"]
+    end
+    subgraph EP["Endpoint VLAN (Parts 9-10)"]
+        LX["Linux endpoint VM"]
+        WIN["Windows endpoint VM"]
+    end
+    subgraph HNSEG["Honeynet VLAN (Part 15)"]
+        DECOY["Decoy service VM"]
+    end
+    RTR["Firewall / router VM (Part 6)"]
+    subgraph NSMSEG["NSM collection segment — receive-only"]
+        SENSOR["Sensor VM: tcpdump now, Zeek/Suricata in Parts 13-14"]
+    end
+
+    LX --- RTR
+    WIN --- RTR
+    DECOY --- RTR
+    HV -. mgmt traffic only, never mirrored .- RTR
+    RTR -- mirrored copy of inter-segment traffic --> SENSOR

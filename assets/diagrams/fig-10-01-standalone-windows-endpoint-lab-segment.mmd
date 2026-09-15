@@ -1,0 +1,24 @@
+flowchart LR
+    subgraph Home["Home network (untouched)"]
+        HomeRouter["Home router / ISP uplink"]
+    end
+
+    subgraph FW["Lab firewall/router — Part 6"]
+        Rules["Deny-by-default inter-VLAN rules"]
+    end
+
+    subgraph LabVLAN["Lab/victim VLAN — Part 4"]
+        WinHost["Standalone Windows 11 VM\nSysmon + forwarding agent\nno domain join"]
+    end
+
+    subgraph CoreVLAN["Core services VLAN — Part 4"]
+        DNS["Internal DNS/DHCP — Part 7"]
+        SIEM["SIEM ingest — Part 8"]
+    end
+
+    WinHost -->|"Sysmon + WinEvtLog, ports 1514/1515"| SIEM
+    WinHost -->|"DNS queries"| DNS
+    LabVLAN -.->|"explicit allow rules only"| CoreVLAN
+    FW -->|"default-deny, no route"| Home
+    LabVLAN --- FW
+    CoreVLAN --- FW

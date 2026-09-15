@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph SIMSEG["Attack-simulation segment (Part 4, dedicated VLAN)"]
+        OP["Operator control host\nInvoke-AtomicRedTeam"]
+        WINEP["Windows target endpoint\n(Part 10, Sysmon)"]
+        LINEP["Linux target endpoint\n(Part 9, auditd)"]
+        OP -->|"WinRM/SSH, in-segment only"| WINEP
+        OP -->|"WinRM/SSH, in-segment only"| LINEP
+    end
+    MIR["Mirror/SPAN port (Part 12)"]
+    NSM["Zeek + Suricata (Parts 13-14)"]
+    SIEM["SIEM ingest (Part 8)"]
+    DASH["Dashboards (Part 17)"]
+    FW["Perimeter firewall (Part 6)"]
+
+    WINEP -->|"Sysmon events"| SIEM
+    LINEP -->|"auditd/journald events"| SIEM
+    SIMSEG -.->|"mirrored copy only"| MIR --> NSM --> SIEM
+    SIEM --> DASH
+    SIMSEG -->|"default-deny egress;\nnarrow allowlist for\nGetPrereqs downloads only"| FW
+    FW -.->|"no route — must stay unreachable"| HOME["Reader's home network"]
+    FW -.->|"no route — must stay unreachable"| OTHER["Any system you don't own"]

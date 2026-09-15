@@ -1,0 +1,38 @@
+flowchart TB
+    INTERNET["Home internet connection"]
+    HOME["Home/production network<br/>personal devices, real credentials"]
+    FW["Lab firewall/router VM<br/>built in Part 6"]
+    SIEM["SIEM ingest<br/>built in Part 8"]
+
+    subgraph MGMT["VLAN 10 - Management"]
+        HV["Hypervisor + firewall admin interfaces"]
+    end
+
+    subgraph VICTIM["VLAN 20 - Lab/victim"]
+        EP["Windows + Linux endpoints, Parts 9-10"]
+    end
+
+    subgraph NSM["VLAN 30 - NSM span"]
+        SENSOR["Zeek/Suricata capture interface, no routable address"]
+    end
+
+    subgraph HONEY["VLAN 40 - Honeynet"]
+        DECOY["Decoy services, Part 15"]
+    end
+
+    INTERNET -->|inbound-only, decoy ports| FW
+    FW -->|explicit allow only| MGMT
+    FW -->|explicit allow only| VICTIM
+    FW -->|mirrored capture, no route| NSM
+    FW -->|inbound-only, zero egress| HONEY
+
+    EP -->|log forward| SIEM
+    SENSOR -->|log forward via mgmt path| SIEM
+    DECOY -->|log forward only| SIEM
+
+    HOME -.->|no route| MGMT
+    HOME -.->|no route| VICTIM
+    HOME -.->|no route| HONEY
+    MGMT -.->|no route| HONEY
+    VICTIM -.->|no route| HONEY
+    HONEY -.->|no egress| INTERNET

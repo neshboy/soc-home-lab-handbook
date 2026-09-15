@@ -1,0 +1,37 @@
+flowchart LR
+    subgraph EXT["Public feed providers — internet"]
+        OTX["AlienVault/LevelBlue OTX\n(Pulses API)"]
+        ABUSE["abuse.ch\n(URLhaus / ThreatFox)"]
+        MISPFEED["Open MISP feed\n(e.g. CIRCL)"]
+    end
+
+    subgraph FW["Part 6 firewall — egress scoped to\nexact feed-provider hostnames, 443/tcp only"]
+        FWR["Explicit allow: collector to feed endpoints\nDefault-deny: everything else"]
+    end
+
+    subgraph MGMT["Management VLAN (Part 4)"]
+        COLLECT["Feed collector\n(script or MISP instance)"]
+        LIST["Normalized indicator list\n(Wazuh CDB list / lookup index)"]
+    end
+
+    subgraph TELEM["Internal telemetry — passive match only"]
+        DNS["Part 7: DNS query log"]
+        NSM["Parts 13-14: Zeek + Suricata logs"]
+        HN["Part 15: Honeynet session logs"]
+    end
+
+    subgraph SIEM["Part 8: SIEM"]
+        MATCH["Enrichment/correlation rule"]
+        DASH["Part 17: dashboard"]
+    end
+
+    OTX --> FWR
+    ABUSE --> FWR
+    MISPFEED --> FWR
+    FWR --> COLLECT
+    COLLECT --> LIST
+    LIST --> MATCH
+    DNS --> MATCH
+    NSM --> MATCH
+    HN --> MATCH
+    MATCH --> DASH

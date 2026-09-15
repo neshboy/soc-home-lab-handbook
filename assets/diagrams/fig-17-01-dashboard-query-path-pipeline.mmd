@@ -1,0 +1,25 @@
+flowchart LR
+    subgraph EP["Endpoint & sensor sources (Parts 9-16)"]
+        Sysmon["Windows Sysmon (Part 10)"]
+        Auditd["Linux auditd (Part 9)"]
+        Zeek["Zeek conn/dns/http (Part 13)"]
+        Suri["Suricata eve.json (Part 14)"]
+        Honey["Honeynet sessions (Part 15)"]
+        TI["Threat-intel enrichment (Part 16)"]
+    end
+    subgraph MG["Management / monitoring VLAN (Part 4)"]
+        SIEM["SIEM index (Part 8)"]
+        Grafana["Grafana dashboard layer (this part)"]
+        Analyst["Analyst workstation"]
+    end
+    FW{{"Firewall — default-deny,\nexplicit allow rules only (Part 6)"}}
+    Sysmon --> FW
+    Auditd --> FW
+    Zeek --> FW
+    Suri --> FW
+    Honey --> FW
+    TI --> FW
+    FW -- "allowed ingest ports only" --> SIEM
+    SIEM -- "read-only query, scoped\nservice account (§3.3)" --> Grafana
+    Analyst -- "3000/tcp dashboard view" --> FW
+    FW -- "dashboard access only" --> Grafana

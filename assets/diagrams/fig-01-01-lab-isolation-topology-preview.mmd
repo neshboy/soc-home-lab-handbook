@@ -1,0 +1,24 @@
+flowchart TB
+    subgraph HOME["Home network — real devices, real credentials"]
+        ROUTER[Home router]
+        REALDEV["Laptops, phones,\nreal accounts"]
+        ROUTER --- REALDEV
+    end
+
+    INTERNET(("Internet"))
+
+    subgraph LAB["Isolated lab segment — Part 4 build"]
+        LABFW["Lab firewall/router VM\n(Part 6)"]
+        MGMT["Management VLAN\nhypervisor, SIEM admin"]
+        ENDPOINT["Endpoint VLAN\nWindows + Linux lab hosts\n(Parts 9-11)"]
+        NSM["NSM tap segment\nZeek / Suricata\n(Parts 12-14)"]
+        HONEY["Honeynet VLAN\ndecoy services\n(Part 15)"]
+        LABFW --> MGMT
+        LABFW --> ENDPOINT
+        LABFW --> NSM
+        LABFW --> HONEY
+    end
+
+    INTERNET --- ROUTER
+    ROUTER -. "no route either direction\n(verified, Appendix A4)" .- LABFW
+    INTERNET -. "inbound-only,\ndecoy ports only" .-> HONEY

@@ -1,0 +1,11 @@
+flowchart TD
+    A[What do you want the lab to run?] --> B{Budget under ~$150,\nusing hardware you\nalready own or can\nfind used?}
+    B -- Yes --> C[Tier 1: repurposed\nlaptop or mini-PC]
+    B -- No --> D{Need Windows endpoints,\nNSM, and a honeynet\nrunning concurrently?}
+    D -- No --> C
+    D -- Yes --> E{"Need long PCAP/log\nretention, or a\nWindows domain\nexperiment (Part 11)?"}
+    E -- No --> F[Tier 2: dedicated\nhome-server box]
+    E -- Yes --> G[Tier 3: multi-node\ncluster]
+    C --> H[Expect to run: one SIEM\n+ 1-2 lightweight endpoints.\nNo full honeynet, no NSM sensor.]
+    F --> I[Expect to run: SIEM +\nLinux/Windows endpoints +\nZeek/Suricata + small honeynet.]
+    G --> J[Expect to run: everything\nTier 2 runs, plus a physically\nseparate honeynet host and\nmonths of retention.]

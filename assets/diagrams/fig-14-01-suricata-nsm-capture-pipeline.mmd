@@ -1,0 +1,22 @@
+flowchart LR
+    subgraph LABNET["Isolated lab segment (Part 4)"]
+        EP["Lab endpoints\n(Parts 9-10)"]
+        HP["Honeynet decoys\n(Part 15)"]
+        SIM["Attack-simulation\ntraffic (Part 18)"]
+    end
+    SW["Lab switch\nmirror/SPAN port\n(Part 12)"]
+    subgraph SENSOR["NSM sensor VM"]
+        ZEEK["Zeek\n(Part 13)"]
+        SURI["Suricata\n(this part)"]
+    end
+    SIEM["SIEM ingest\n(Part 8)"]
+    DASH["Dashboards\n(Part 17)"]
+
+    EP --> SW
+    HP --> SW
+    SIM --> SW
+    SW -- "mirrored copy, af_packet" --> ZEEK
+    SW -- "mirrored copy, af_packet" --> SURI
+    ZEEK -- "conn/dns/http/ssl logs" --> SIEM
+    SURI -- "eve.json alerts" --> SIEM
+    SIEM --> DASH

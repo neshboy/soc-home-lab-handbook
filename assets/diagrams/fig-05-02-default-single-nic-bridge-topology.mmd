@@ -1,0 +1,6 @@
+graph TD
+    NIC[Physical NIC<br/>e.g. nic0] --> VMBR0[vmbr0 bridge<br/>host management + all guest traffic]
+    VMBR0 --> HostMgmt[Host management<br/>web UI :8006 / SSH :22]
+    VMBR0 --> GuestA[Future guest VM/CT #1]
+    VMBR0 --> GuestB[Future guest VM/CT #2]
+    VMBR0 -.Part 6 adds a firewall VM here.-> Future[Isolated segment,<br/>built in Part 4 / Part 6]

@@ -1,0 +1,16 @@
+flowchart TB
+    INTERNET["Home internet connection"]
+    HOME["Home/production network<br/>(personal devices, real credentials)"]
+
+    subgraph LAB["Lab environment — any pattern from §1"]
+        MGMT["Management network<br/>hypervisor console, firewall admin, SIEM admin"]
+        VICTIM["Lab/victim network<br/>Windows + Linux endpoints, SIEM ingest,<br/>NSM sensor, attack-simulation targets"]
+        HONEY["Honeynet segment<br/>intentionally vulnerable decoy services"]
+    end
+
+    INTERNET -->|inbound-only, specific ports| HONEY
+    HOME -.->|no route| MGMT
+    HOME -.->|no route| VICTIM
+    HOME -.->|no route| HONEY
+    MGMT -.->|no route| HONEY
+    VICTIM -.->|no route| HONEY

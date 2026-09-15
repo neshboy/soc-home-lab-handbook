@@ -1,0 +1,11 @@
+flowchart LR
+    subgraph EP["Linux lab endpoint (this part)"]
+        AUD["auditd rules\nidentity, sudoers, sshd_config, exec"] --> LOG["/var/log/audit/audit.log"]
+        LOG --> PLUGIN["audisp-syslog plugin"]
+        JRNL["journald\nsudo, SSH auth, systemd units"] --> FWDJ["ForwardToSyslog=yes"]
+        PLUGIN --> RSYS["local rsyslog"]
+        FWDJ --> RSYS
+    end
+    RSYS -->|"omfwd, TCP, mgmt VLAN only"| FW["Perimeter firewall\n(Part 6)"]
+    FW -->|"allowed: SIEM syslog port"| SIEM["SIEM ingest\n(Part 8)"]
+    FW -.->|"default-deny — no route"| HOME["Reader's home network\n(must stay unreachable)"]

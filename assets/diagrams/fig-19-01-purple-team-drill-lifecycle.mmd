@@ -1,0 +1,12 @@
+flowchart TD
+    A["Pick a technique\n(MITRE ATT&CK ID, Part 18 test)"] --> B["Map to a named detection\n(Detection Engineering Handbook V2)"]
+    B --> C["Map to a named playbook\n(SOC Playbook Handbook)"]
+    C --> D["Inject a ground-truth marker\n(logger, per Section 3.2)"]
+    D --> E["Execute the technique\n(isolated lab segment only)"]
+    E --> F["Confirm telemetry arrived\n(Part 8 SIEM search)"]
+    F --> G{"Did the mapped\ndetection fire?"}
+    G -->|"Yes"| H["Run the mapped playbook\nas a live triage rehearsal"]
+    G -->|"No"| I["Log a detection gap\n(Detection Engineering Handbook V2)"]
+    H --> J["Record result in the drill log\n(Section 6)"]
+    I --> J
+    J --> K["Feed results into a program\n(SOC Manager's Operating Handbook)"]

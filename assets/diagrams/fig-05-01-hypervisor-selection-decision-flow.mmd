@@ -1,0 +1,15 @@
+flowchart TD
+    A[What hardware do you have?] --> B{Dedicated box you<br/>can wipe? Tier 2/3}
+    B -->|No — shared laptop/desktop, Tier 1| C{Primarily Windows,<br/>Pro/Enterprise edition?}
+    C -->|Yes| D[Hyper-V]
+    C -->|No, or need it running<br/>alongside other apps| E[VirtualBox]
+    B -->|Yes| F{Existing paid vSphere<br/>entitlement already?}
+    F -->|Yes| G[ESXi / vSphere]
+    F -->|No| H[Proxmox VE —<br/>this part's walkthrough]
+    H --> I{Need a persistent<br/>Windows Server domain?}
+    I -->|Yes, understand the cost — see Part 11| J[Plan a short-lived<br/>eval-image domain, not<br/>a permanent forest]
+    I -->|No, Linux-first lab| K[Continue to Part 6:<br/>firewall VM on this host]
+    D --> K
+    E --> K
+    G --> K
+    J --> K
