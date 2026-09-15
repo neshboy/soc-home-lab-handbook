@@ -137,7 +137,7 @@ Confirm it worked by running `Get-Service sysmon64` and checking for a `Running`
 
 ### 5.2 Applying a real configuration baseline
 
-**[SETUP]** Don't write a Sysmon configuration from scratch for a first build. Adapt one of the maintained public baselines — SwiftOnSecurity's `sysmon-config` and Olaf Hartong's `sysmon-modular` are the two most widely used starting points — and trim it to what your lab's hardware can log without flooding disk. Appendix A3 hosts this book's own trimmed baseline, built from those community sources, for exactly this purpose rather than repeating a full config inline in every part that needs one.
+**[SETUP]** Don't write a Sysmon configuration from scratch for a first build. Adapt one of the maintained public baselines — SwiftOnSecurity's `sysmon-config` and Olaf Hartong's `sysmon-modular` are the two most widely used starting points — and trim it to what your lab's hardware can log without flooding disk. Appendix A3 hosts this book's own trimmed baseline, built from those community sources, for exactly this purpose rather than repeating a full config inline in every part that needs one. Appendix A3 is not yet authored (see `README.md`); until it is, adapt one of the two community baselines above directly.
 
 CONCEPTUAL SAMPLE — an illustrative excerpt only, not a complete or build-tested configuration; adapt a maintained public baseline instead of typing one from scratch.
 ```xml
@@ -168,7 +168,7 @@ After applying any config change, confirm it took effect by running `Sysmon64.ex
 The Wazuh path is shown here as the worked example, since it needs the fewest moving parts for a first build. Run this from an elevated PowerShell prompt on the Windows endpoint, targeting a Wazuh 4.x manager already reachable on the lab segment:
 
 ```powershell
-msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="10.10.30.5" WAZUH_AGENT_GROUP="windows-endpoints"
+msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="10.10.10.5" WAZUH_AGENT_GROUP="windows-endpoints"
 ```
 
 The agent connects to the manager on port 1514 for ongoing event traffic and port 1515 for one-time enrollment; both need an explicit allow rule at the lab firewall if Part 6's rule set doesn't already have one for SIEM ingest. Confirm the agent enrolled by checking the Wazuh manager's dashboard for this host in an `Active` state, or by running `Get-Service -Name WazuhSvc` locally and confirming it's running.
@@ -178,7 +178,7 @@ The agent connects to the manager on port 1514 for ongoing event traffic and por
 **[HANDS-ON LAB]** Generate one known event on the endpoint and confirm it arrives at the SIEM before treating the pipeline as working.
 
 > **Validation Test**
-> **Setup:** Sysmon installed with the Appendix A3 baseline, the Wazuh agent (or Winlogbeat/Sidecar equivalent) enrolled and running, both confirmed per the previous two sections.
+> **Setup:** Sysmon installed with the Appendix A3 baseline (not yet authored — see `README.md`; substitute an adapted SwiftOnSecurity/`sysmon-modular` config per §5.2 until it exists), the Wazuh agent (or Winlogbeat/Sidecar equivalent) enrolled and running, both confirmed per the previous two sections.
 > **Action:** `powershell -Command "Start-Process cmd.exe -ArgumentList '/c whoami'"` on the Windows endpoint.
 > **Expected result:** A Sysmon Event ID 1 (Process Create) entry appears in the SIEM within seconds, showing `ParentImage` = the PowerShell process and `Image` pointing to `cmd.exe`, followed immediately by a second Event ID 1 entry for `whoami.exe` with `cmd.exe` as its parent.
 

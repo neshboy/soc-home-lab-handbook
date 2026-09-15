@@ -115,6 +115,8 @@ This book reuses the Detection Engineering Handbook V2's four-class figure-evide
 
 *File path pattern:* `C:\Users\User\projects\soc-home-lab-handbook\appendices\aN-slug.md`
 
+**Status: not yet authored.** The file paths below are the planned locations (see `README.md`, Repository Layout); `appendices/` currently contains none of them. Every in-chapter citation of Appendix A1–A5 — including the Safety Gate/Validation Test boxes in Parts 4, 6, 10, 15, 18, and 19 that name A3 or A4 as the operative artifact — is a forward reference to this planned content, not a link to something built yet.
+
 | Appendix | Title | File Path | Contents |
 |---|---|---|---|
 | A1 | Network Topology & VLAN Diagram Templates | `appendices\a1-network-topology-and-vlan-diagram-templates.md` | Reference lab-network diagrams (single-host, multi-host, honeynet-segmented), VLAN plan templates, a worked "isolation-proof" diagram showing every intentional and unintentional path in and out of a lab segment. Companion to Parts 2, 4, 6. |
