@@ -87,6 +87,9 @@ https://download.opensuse.org/repositories/security:/zeek/xUbuntu_22.04/ /" \
 sudo apt update
 sudo apt install -y zeek
 ```
+
+The `xUbuntu_22.04` repository path above is still live and current as of this writing, but it's version-pinned to a specific Ubuntu release, not to a specific Zeek release — the same repository now also serves Zeek 7.x/8.x builds well past the 6.0/6.1 line this part targets (with Zeek 9.0 having just shipped separately as of this writing), and Zeek's own install docs are the place to confirm the current package repository path for whatever Ubuntu release you're actually running (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [ZEEK-INSTALL-DOCS]).
+
 3. Zeek installs to `/opt/zeek` rather than the usual `/usr` tree. Add its `bin` directory to your path so `zeekctl` is reachable without a full path every time:
 ```bash
 echo 'export PATH=/opt/zeek/bin:$PATH' | sudo tee /etc/profile.d/zeek.sh

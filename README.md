@@ -69,3 +69,4 @@ python add_watermark.py
 - `assets/diagrams/` — rendered Mermaid SVGs (and their `.mmd` sources) for every diagram in the book.
 - `build/` — the build/render/watermark tooling above.
 - `BOOK-INDEX.md`, `STYLE-GUIDE.md` — cross-cutting project documentation: the canonical part list and the voice/format/safety contract every part follows.
+- `REFERENCES.md` — full citations for every `OFFICIAL REFERENCE`-tagged claim or figure, keyed by the bracket ID (e.g. `[COWRIE-REPO]`) named in the citing part's text.

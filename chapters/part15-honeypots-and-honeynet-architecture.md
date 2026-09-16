@@ -24,16 +24,18 @@ This part builds a honeynet: more than one decoy service, plus the plumbing that
 
 **[CONCEPT]** A honeypot is a service with no legitimate users. Anything that talks to it is, by definition, either a misconfigured scanner, an automated bot, or an actual attacker — there's no "normal traffic" baseline to build here because there's no normal use case at all. That single property is what makes honeypot telemetry unusually clean compared to everything else in this book: a Sysmon or auditd event needs a baseline of legitimate activity subtracted out before it's interesting, but every single connection a decoy service receives is worth at least a glance.
 
-Honeypots split into two rough interaction levels, and the split determines what a decoy can teach you:
+Honeypots split into two rough interaction levels — terminology that goes back to early honeypot research and is still the working vocabulary the honeypot community and tool authors use today (`OFFICIAL REFERENCE` — see `REFERENCES.md` entries [SPITZNER-HONEYPOTS-2002] and [HONEYNET-PROJECT]) — and the split determines what a decoy can teach you:
 
 - **Low/medium-interaction** decoys emulate a service's surface behavior — they'll accept a connection, present a banner, log a credential attempt — without running the real underlying software. Cowrie (SSH/Telnet) is the canonical example: it looks enough like an SSH server to collect banners and credential-stuffing attempts, but there's no real shell behind it for an attacker to actually compromise.
 - **High-interaction** decoys run real, deliberately unpatched software — an old phpMyAdmin, an outdated Apache — with a real (if sacrificial) filesystem behind it. These catch more sophisticated interaction, including actual exploit attempts against a real vulnerable code path, at the cost of running genuinely exploitable software that must be treated as fully compromised the moment anything beyond routine probing touches it.
 
 A honeypot does not stop, slow down, or deceive a determined attacker who already knows what they're targeting — it exists to catch *unsolicited* contact from scanners and opportunistic bots that don't know or care what they've found. That's a narrower promise than the word "honeypot" sometimes implies in security marketing, and it's worth stating precisely now, because §11 comes back to exactly this limit once the rest of this part has built something.
 
+This isn't a hunch about internet traffic — it's a measured phenomenon with its own name in the network-research literature. Academic "network telescopes" (large blocks of otherwise-unused, routed address space with nothing legitimate listening on them) see the same constant hum of scans, backscatter, and misconfigured traffic a single decoy does, just at a much larger scale, and researchers have been characterizing that background noise for two decades under the name "internet background radiation" (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [PANG-BACKRAD-2004]). A honeynet is a hobbyist-scale instrument pointed at the same phenomenon a network telescope studies at internet scale.
+
 ## 2. Honeynet architecture: from one decoy to a correlated segment
 
-**[CONCEPT]** A single decoy service tells you that something touched it. A honeynet — several decoys plus the plumbing to correlate what they see — tells you that the *same source* touched several of them, in what order, and whether the pattern looks like reconnaissance, an exploit attempt, or something that kept going afterward. That correlation is what turns raw connection logs into the kind of evidence Detection Engineering Handbook V2 can actually reason about.
+**[CONCEPT]** A single decoy service tells you that something touched it. A honeynet — several decoys plus the plumbing to correlate what they see — tells you that the *same source* touched several of them, in what order, and whether the pattern looks like reconnaissance, an exploit attempt, or something that kept going afterward. That correlation is what turns raw connection logs into the kind of evidence Detection Engineering Handbook V2 can actually reason about. "Decoys plus correlation" isn't this book's own coinage — it's a long-standing framing in the honeypot research community that predates this book's build.
 
 The author's own honeynet splits this across three roles, and this part's build follows the same split rather than inventing a different one:
 
@@ -82,6 +84,8 @@ The table below compares four realistic honeypot software choices for the decoys
 | Deliberately unpatched real service (old phpMyAdmin, old Apache) | High | Whatever the real software speaks | Moderate — it's genuinely running the software | Readers who understand the sacrificial-host commitment in §5's Safety Gate and want real exploit-attempt telemetry, not simulated banners |
 | T-Pot (bundled multi-honeypot + Suricata + ELK) | Mixed (bundles several of the above) | Dozens of protocols simultaneously | Heaviest — a multi-container stack, budget against Part 3's higher tiers | Readers who want broad protocol coverage out of one install rather than building each decoy by hand |
 
+Cowrie, Dionaea, and T-Pot are real, actively-maintained open-source projects rather than composite or illustrative examples; their own repositories are the canonical source for current install instructions, supported protocols, and resource footprint, ahead of any third-party tutorial (`OFFICIAL REFERENCE` — see `REFERENCES.md` entries [COWRIE-REPO], [DIONAEA-REPO], and [TPOT-REPO]).
+
 This book's worked examples in §4 and §5 build a Cowrie-style SSH decoy and a custom HTTP decoy — the two lightest, most instructive options — and treat the deliberately-unpatched high-interaction pattern (§5's sidebar) as an explicit, higher-risk variant rather than the default.
 
 ## 3. Placing the honeynet on the isolated topology
@@ -127,7 +131,7 @@ Sep 10 16:21:04 honeynet-edge sshd[550]: Connection closed by 192.168.1.96 port 
 **[SETUP]** The steps below target Cowrie's official installation method on Debian-family Linux, matching the honeynet segment's isolated container/VM.
 
 1. Create the decoy's VM or container with its only network interface on the honeynet VLAN from §3 — verify this in your hypervisor's network settings before proceeding, exactly as Part 7 warned for the DNS resolver.
-2. Install Cowrie's dependencies and clone the official repository per its current install guide.
+2. Install Cowrie's dependencies and clone the official repository, `https://github.com/cowrie/cowrie` (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [COWRIE-REPO]), per its current install guide.
 3. Create and activate Cowrie's Python virtual environment.
 4. Configure `cowrie.cfg` to listen on port `2222` for SSH — never port 22, which this book reserves exclusively for real administrative access on the management network, never a decoy.
 5. Set a fake hostname and filesystem fingerprint in Cowrie's configuration that matches neither your real lab's naming convention nor any hostname used elsewhere in this book's builds, per the Safety Gate's naming-hygiene condition.
@@ -174,7 +178,7 @@ id   ts                                src_ip           method  path            
 686  2026-09-09T20:40:51.502493+00:00  85.217.149.47    GET     /favicon.ico         Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 ModatScanner/1.2 (+https://modat.io/)
 ```
 
-**Figure 15.4 — Real HTTP decoy exploit-probe excerpt.** *REAL LAB EXAMPLE.* Captured from the author's own CT103 honeynet backend (`http_events` table) on 2026-09-15; underlying events span 2026-09-09. Row 694 is a POST to `/GponForm/diag_Form` — the well-known path for the GPON router authentication-bypass RCE (CVE-2018-10561/CVE-2018-10562), still mass-scanned for today, mapping to T1190 (Exploit Public-Facing Application). Rows 692–693 are from an internet-wide scanner ("Infrawatch/1.0") specifically probing for exposed MCP (Model Context Protocol) endpoints — a reminder that decoy telemetry reflects whatever the internet is currently scanning for, not a fixed, predictable set of probes.
+**Figure 15.4 — Real HTTP decoy exploit-probe excerpt.** *REAL LAB EXAMPLE.* Captured from the author's own CT103 honeynet backend (`http_events` table) on 2026-09-15; underlying events span 2026-09-09. Row 694 is a POST to `/GponForm/diag_Form` — the well-known path for the GPON router authentication-bypass RCE (CVE-2018-10561, the `?images`-suffix auth bypass, chained with CVE-2018-10562, command injection via the `dest_host` parameter — `OFFICIAL REFERENCE`, see `REFERENCES.md` entries [CVE-2018-10561] and [CVE-2018-10562]), still mass-scanned for today, mapping to T1190 (Exploit Public-Facing Application). Rows 692–693 are from an internet-wide scanner ("Infrawatch/1.0") specifically probing for exposed MCP (Model Context Protocol) endpoints — a reminder that decoy telemetry reflects whatever the internet is currently scanning for, not a fixed, predictable set of probes.
 
 ## 6. Session correlation: turning raw hits into attacker sessions
 

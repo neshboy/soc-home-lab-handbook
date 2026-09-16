@@ -75,6 +75,8 @@ curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh
 sudo bash ./wazuh-install.sh -a
 ```
 
+Confirmed current as of this writing: the 4.7 script above still downloads and runs (version-pinned to Wazuh 4.7.5 internally), but Wazuh's own quickstart docs now default to a newer release path (`packages.wazuh.com/4.14/...` at the time of this check) — expect the version number in this URL to keep moving, and check the official quickstart before assuming 4.7 is still current when you build this (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [WAZUH-QUICKSTART]).
+
 The `-a` flag tells the script to install the manager, indexer, and dashboard together on this one node — the "all-in-one" pattern this book uses throughout. The script takes several minutes and prints an admin username and a generated password for the dashboard at the very end; copy that password immediately, since it isn't shown again and the terminal scrollback is your only other copy. To confirm the install actually succeeded rather than silently failing partway through, check that all three services are active before doing anything else:
 
 ```bash

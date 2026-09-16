@@ -80,6 +80,8 @@ sudo apt-get install -y grafana
 sudo systemctl enable --now grafana-server
 ```
 
+The key/repo URLs above still resolve, but Grafana's own current install docs have shifted to a renamed key file (`gpg-full.key` instead of `gpg.key`) stored as `/etc/apt/keyrings/grafana.asc` with an explicit `chmod 644` step, not the `.gpg` filename used above — functionally equivalent, but check the official docs if `apt-get update` starts complaining about the keyring (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [GRAFANA-INSTALL-DOCS]).
+
 Confirm the install worked before touching configuration by checking that the service is actually up and listening where you expect:
 
 ```bash

@@ -197,6 +197,8 @@ echo "deb http://download.proxmox.com/debian/pve trixie pve-no-subscription" \
 apt update && apt full-upgrade -y
 ```
 
+The single-line `.list` form above still works on Proxmox VE 9's trixie base, but Proxmox's own current documentation has moved to the deb822 multi-line format (`/etc/apt/sources.list.d/proxmox.sources`) and specifically notes that `apt` on trixie will complain about the legacy single-line syntax — cosmetic for now, but worth knowing before you go looking for why `apt update` prints a deprecation warning (`OFFICIAL REFERENCE` — see `REFERENCES.md` entry [PROXMOX-REPOS]).
+
 5. Reboot if the kernel was updated (`pveversion -v` will show a kernel version mismatch against `uname -r` if a reboot is pending).
 
 > **Validation Test**
