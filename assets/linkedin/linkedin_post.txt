@@ -1,0 +1,14 @@
+The SOC Home Lab Handbook. Free. Public. Built to be attacked and defended — safely.
+
+Every other NESHBOY volume assumes a SIEM, telemetry, and alerts already exist. This is the book for the reader who has none of that yet: a SIEM to search, Linux and Windows endpoints producing real logs, a segmented network, Zeek and Suricata on the wire, honeypots pulling in unsolicited attacker traffic, threat-intel enrichment, dashboards worth looking at, and safe, reversible attack simulation to generate known-cause telemetry on demand.
+
+249 pages. ~95,800 words. 22 parts. And 22 mandatory Safety Gates — one in every single part, no exceptions — because half of what this book teaches you to build is, by design, meant to be attacked.
+
+It's also honest about where the real evidence stops. The author's own lab is real, continuously running, and Linux-and-network only — a Pi-hole resolver, a honeynet, several monitored containers. That's where the REAL LAB EXAMPLE evidence actually comes from. No Windows host, no Active Directory domain, no cloud tenant — and the book says so plainly instead of faking it.
+
+Which is exactly what Part 11 is for. The author tried a persistent two-DC Active Directory forest for Kerberos telemetry practice. It never finished. GPO rollout silently failed to apply — no error, just an endpoint quietly keeping its old audit policy — and the build stalled at a half-configured single DC. Part 11 is that build's autopsy: what a domain lab actually costs, why an auditd rule failing is nothing like a GPO failing, and the realistic scoped-down alternative that doesn't turn a hobbyist into an unpaid part-time AD administrator.
+
+That's the standard for the whole book: build it for real when it's real, label it CONCEPTUAL or OFFICIAL REFERENCE when it isn't, and never blur the two together.
+
+Full PDF: https://raw.githubusercontent.com/neshboy/soc-home-lab-handbook/master/SOC_Home_Lab_Handbook.pdf
+Repo: https://github.com/neshboy/soc-home-lab-handbook
